@@ -5,7 +5,7 @@ const urlRoute = require('./routes/url');
 const staticRoute = require('./routes/staticRoute')
 const { URL } = require('./models/url');
 require('dotenv/config');
-const mongo_connect = process.env.MONGO_CONNECT;
+const mongo_connect = process.env.MONGO_CONNECT; //Add your own DB
 const port = process.env.PORT || 3000;
 
 mongooseConnect(`${mongo_connect}/url-shortner`)
@@ -27,29 +27,7 @@ app.use(express.urlencoded({extended: true})); // This middleware help us to enc
 app.use('/url', urlRoute);
 app.use('/', staticRoute);
 
-// app.get('/url/:shortId', async (req, res) => {
-//     const shortId = req.params.shortId;
-//     console.log(shortId);
-//     const entry = await URL.findOneAndUpdate(
-//         {
-//             shortId,
-//         },
-//         {
-//             $push: { // visitedHistory is array, so pushing new array on every click
-//                 visitedHistory: {
-//                     timestamp: Date.now(),
-//                 }
-//             }
-//         })
-//         console.log(entry);
-//         if(entry){
-//             res.redirect(entry.redirectUrl);
-//         }
-//         else{
-//             res.status(404).send('No entry found for the given URL');
-//         }
 
-// })
 
 
 app.listen(port, () => {
@@ -60,3 +38,9 @@ app.listen(port, () => {
 // Method- Post , route-> /url => to get shortid
 // Method- Get, route-> /:shortUrl => to redirect to ur given link
 // Method- Get, route-> /url/analytics/:id => to get analytics of ur shortUrl clicks
+
+//To-do
+//Make sure when you send url shortner link it should land on / route instead of /url
+//And url generate link only while clicking on that button and not on refresh of page
+//Auth-
+//Schema, login/signup page and route -> Generate sessionUID -> store it in form of cookies -> check and give response according -> generate analytics for individually
