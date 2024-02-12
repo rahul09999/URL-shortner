@@ -1,0 +1,24 @@
+const mongoose = require('mongoose');
+
+const urlSchema = new mongoose.Schema(
+    {
+        shortId: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+        redirectUrl: {
+            type: String,
+            required: true,
+        },
+        visitedHistory: [{
+            timestamp: {
+                type: Number,
+            }
+        }]
+    
+}, {timestamps: true} ); // it is mongoDB property which automatically add createdAt and updatedAt on our DataBase 
+
+const URL = mongoose.model("url", urlSchema);
+
+module.exports = { URL };
