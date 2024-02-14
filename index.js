@@ -1,13 +1,17 @@
 const express = require('express');
 const app = express();
 const { mongooseConnect } = require('./connect');
-const urlRoute = require('./routes/url');
-const staticRoute = require('./routes/staticRoute')
 const { URL } = require('./models/url');
 require('dotenv/config');
 const mongo_connect = process.env.MONGO_CONNECT; //Add your own DB
 const port = process.env.PORT || 3000;
 
+//Routes
+const urlRoute = require('./routes/url');
+const staticRoute = require('./routes/staticRoute')
+const userRoute = require('./routes/user');
+
+//Mongo-Connection
 mongooseConnect(`${mongo_connect}/url-shortner`)
 .then(() => console.log("MongoDB is connected..."))
 .catch((err) => {
@@ -23,9 +27,10 @@ app.set('view engine', 'ejs'); //by default express knows all UI component is pr
 app.use(express.json());
 app.use(express.urlencoded({extended: true})); // This middleware help us to encode form data
 
-
+//Route-middleware
 app.use('/url', urlRoute);
 app.use('/', staticRoute);
+app.use('/user', userRoute);
 
 
 
