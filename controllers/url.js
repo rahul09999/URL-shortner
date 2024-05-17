@@ -3,16 +3,21 @@ const {URL} = require('../models/url');
 
 async function handleGenerateNewShortUrl(req, res){
 
+    //Check if URL provided or not
     const body = req.body;
     if(!body.url) return res.status(400).json({
         error: "Url is required",
     })
+
+    //Create and Save shortID and URL in DB
     const shortId = nanoid.nanoid(8);
     await URL.create({
         shortId: shortId,
         redirectUrl: body.url,
         visitedHistory: [],
     })
+
+    //pass URL and shortID
     const allUrls = await URL.find({})
     return res.render('home', { // its goes to home page with property id(which will be in locals object) to render page with data
         id: shortId,
@@ -24,6 +29,8 @@ async function handleGenerateNewShortUrl(req, res){
 }
 
 async function handleAnalytics(req, res){
+
+    //Pass Analytics of shortID
     const shortId = req.params.id;
     const data = await URL.findOne({ shortId })
     res.json({
@@ -32,9 +39,12 @@ async function handleAnalytics(req, res){
     })
 }
 
+//Whenever user goes to ShortId url, this function will be called
 async function handleUrlRedirect(req, res){
     const shortId = req.params.shortId;
     console.log(shortId);
+
+    //Get shortId and update visited history
     const entry = await URL.findOneAndUpdate(
         {
             shortId,

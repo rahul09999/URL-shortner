@@ -22,7 +22,7 @@ app.set('port', port); // Set the port number as a property of the app object, c
 //register view engine(UI part)
 app.set('view engine', 'ejs'); //by default express knows all UI component is present in views folder, so we dont need to explicity define it
 //what if folder name is not view? Just Add below syntax
-//app.set('views', 'YourFolderName') // YourFolderName -> where ur UI stuffs there
+//app.set('views', path.resolve("./YourFolderName") // YourFolderName -> where ur UI stuffs there
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true})); // This middleware help us to encode form data

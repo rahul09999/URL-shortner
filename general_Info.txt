@@ -1,0 +1,26 @@
+
+Project Structure:
+- server.js: Entry point of the application, sets up the server and routes requests.
+-routes: 
+1. app.use('/url', urlRoute);
+    url:
+        1. handleGenerateNewShortUrl -> route(/url) -> generate Short Urls
+        2. handleAnalytics -> route(/url/analytics/:id)
+        3. handleUrlRedirect -> route(/url/:shortId)
+
+2. app.use('/', staticRoute);
+    staticRoute:
+        1. Get all Urls, and shows that -> route('/')
+        2. LoginPage -> route('/login') -> render this page
+        3. SignUpPage -> route('/signup') -> render this page
+
+3. app.use('/user', userRoute);
+    user:
+        1. handleUserSignUp -> route('/') -> store info in DB and render home page
+        2. handleUserLogin -> route('/login') -> check DB and remder home page
+
+- models/user.js: Defines the user schema and handles database operations related to user accounts.
+- models/url.js: Defines the URL schema and handles database operations related to shortened URLs.
+
+- views/: Contains HTML templates for rendering frontend pages.
+- public/: Contains static assets such as CSS and JavaScript files.
