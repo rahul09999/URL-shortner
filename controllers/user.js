@@ -1,5 +1,7 @@
 const USER = require('../models/user')
 const { URL } = require('../models/url')
+const { v4: uuidv4 } = require('uuid');
+const {setUser, getUser} = require('../service/auth');
 
 
 async function handleUserSignUp(req, res) {
@@ -22,12 +24,19 @@ async function handleUserLogin(req, res) {
     //Store body(data) coming from frontend
     const {email, password } = req.body;
     const user = await USER.findOne({ email , password });
+
     //If not found then return it to login page
     if(!user){
         return res.render("login", {
             error:"Invalid email or password",
         });
     }
+
+    //here comes when Login Details is right, create sessionid for user
+    const sessionid = uuidv4();
+    setUser(sessionid, user); //make map of sessionId and User
+    res.cookie("uid", sessionid);
+
     //Redirect to Home page
     return res.redirect('/');
 }

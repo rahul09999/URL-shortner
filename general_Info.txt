@@ -22,5 +22,9 @@ Project Structure:
 - models/user.js: Defines the user schema and handles database operations related to user accounts.
 - models/url.js: Defines the URL schema and handles database operations related to shortened URLs.
 
+-uuid -> used as uniques session id for user
+    -If anyone logins then its sessionId created and get stored in map at file(../service/auth)
+
+
 - views/: Contains HTML templates for rendering frontend pages.
 - public/: Contains static assets such as CSS and JavaScript files.

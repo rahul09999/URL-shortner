@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cookieParser = require('cookie-parser')
 const { mongooseConnect } = require('./connect');
 const { URL } = require('./models/url');
 require('dotenv/config');
@@ -10,6 +11,7 @@ const port = process.env.PORT || 3000;
 const urlRoute = require('./routes/url');
 const staticRoute = require('./routes/staticRoute')
 const userRoute = require('./routes/user');
+const {restrictToLoggedinUserOnly} = require('./middlewares/middleAuth'); //check For uuid, if not exist then redirect to login Page
 
 //Mongo-Connection
 mongooseConnect(`${mongo_connect}/url-shortner`)
@@ -26,9 +28,10 @@ app.set('view engine', 'ejs'); //by default express knows all UI component is pr
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true})); // This middleware help us to encode form data
+app.use(cookieParser());
 
 //Route-middleware
-app.use('/url', urlRoute);
+app.use('/url', restrictToLoggedinUserOnly, urlRoute); //if we need to go /url route then we need an UUID which means only login user can access that
 app.use('/', staticRoute);
 app.use('/user', userRoute);
 
