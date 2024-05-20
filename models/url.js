@@ -15,7 +15,11 @@ const urlSchema = new mongoose.Schema(
             timestamp: {
                 type: Number,
             }
-        }]
+        }],
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId, //type is objectId that mongo creates
+            ref: "users", //ref to user who created that shortId
+        },
     
 }, {timestamps: true} ); // it is mongoDB property which automatically add createdAt and updatedAt on our DataBase 
 

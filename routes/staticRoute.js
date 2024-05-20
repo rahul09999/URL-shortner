@@ -4,7 +4,8 @@ const {URL} = require('../models/url')
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    const allUrls = await URL.find({}) // its array of data(of collections of mongoDB)
+    if(!req.user) return res.redirect('/login')
+    const allUrls = await URL.find({ createdBy: req.user._id }) // find({}) its array of data(of collections of mongoDB) and for find({ createdBy: req.user._id })->> it find only specific user created shortIds using their sessionId(UUID)
     return res.render('home', {
         urls : allUrls,
     });

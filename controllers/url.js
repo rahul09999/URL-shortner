@@ -15,6 +15,7 @@ async function handleGenerateNewShortUrl(req, res){
         shortId: shortId,
         redirectUrl: body.url,
         visitedHistory: [],
+        createdBy: req.user._id, //user comes from ./middleware/auth.js which checks whether user login or not and _id is objectName used by mongo for each new db entries
     })
 
     //pass URL and shortID

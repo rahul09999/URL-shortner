@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000;
 const urlRoute = require('./routes/url');
 const staticRoute = require('./routes/staticRoute')
 const userRoute = require('./routes/user');
-const {restrictToLoggedinUserOnly} = require('./middlewares/middleAuth'); //check For uuid, if not exist then redirect to login Page
+const {restrictToLoggedinUserOnly, checkBasicAuth } = require('./middlewares/middleAuth'); //check For uuid, if not exist then redirect to login Page
 
 //Mongo-Connection
 mongooseConnect(`${mongo_connect}/url-shortner`)
@@ -32,7 +32,7 @@ app.use(cookieParser());
 
 //Route-middleware
 app.use('/url', restrictToLoggedinUserOnly, urlRoute); //if we need to go /url route then we need an UUID which means only login user can access that
-app.use('/', staticRoute);
+app.use('/', checkBasicAuth , staticRoute);
 app.use('/user', userRoute);
 
 
