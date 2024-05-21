@@ -54,6 +54,10 @@ Project Structure:
 
 
 -->> Stateless(using jwt), so that we can store actual data in token using secret key which is known to me only
+1. Method 1(using cookies):- Automatically get added to browser, problem? can only be used by browser based apps/websites 
+-commit ID - 4687e39, though it works only for browser based Application
+2. Method 2(using headers):- Here we send tokens in headers using res.json and header-> Authorization: Bearer <token>
+
 - views/: Contains HTML templates for rendering frontend pages.
 - public/: Contains static assets such as CSS and JavaScript files.
 
