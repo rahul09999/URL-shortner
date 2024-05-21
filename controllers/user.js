@@ -33,9 +33,13 @@ async function handleUserLogin(req, res) {
     }
 
     //here comes when Login Details is right, create sessionid for user
-    const sessionid = uuidv4();
-    setUser(sessionid, user); //make map of sessionId and User
-    res.cookie("uid", sessionid);
+    // const sessionid = uuidv4();
+    // setUser(sessionid, user); //make map of sessionId and User
+    // res.cookie("uid", sessionid);
+
+    const token = setUser(user);
+    res.cookie("uid", token);
+
 
     //Redirect to Home page
     return res.redirect('/');
