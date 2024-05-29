@@ -11,7 +11,8 @@ const port = process.env.PORT || 3000;
 const urlRoute = require('./routes/url');
 const staticRoute = require('./routes/staticRoute')
 const userRoute = require('./routes/user');
-const {restrictToLoggedinUserOnly, checkBasicAuth } = require('./middlewares/middleAuth'); //check For uuid, if not exist then redirect to login Page
+// const {restrictToLoggedinUserOnly, checkBasicAth } = urequire('./middlewares/middleAuth'); //check For uuid, if not exist then redirect to login Page
+const { checkForAuthentication, restrictTo } = require('./middlewares/middleAuth'); 
 
 //Mongo-Connection
 mongooseConnect(`${mongo_connect}/url-shortner`)
@@ -29,10 +30,11 @@ app.set('view engine', 'ejs'); //by default express knows all UI component is pr
 app.use(express.json());
 app.use(express.urlencoded({extended: true})); // This middleware help us to encode form data
 app.use(cookieParser());
+app.use(checkForAuthentication);
 
 //Route-middleware
-app.use('/url', restrictToLoggedinUserOnly, urlRoute); //if we need to go /url route then we need an UUID which means only login user can access that
-app.use('/', checkBasicAuth , staticRoute);
+app.use('/url', restrictTo(["NORMAL", "ADMIN"]), urlRoute); //if we need to go /url route then we need an UUID which means only login user can access that
+app.use('/', staticRoute);
 app.use('/user', userRoute);
 
 

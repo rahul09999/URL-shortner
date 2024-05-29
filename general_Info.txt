@@ -58,6 +58,12 @@ Project Structure:
 -commit ID - 4687e39, though it works only for browser based Application
 2. Method 2(using headers):- Here we send tokens in headers using res.json and header-> Authorization: Bearer <token>
 
+
+-->Authorization:- Roles of individual to access specific resources
+-->Authentication:-  login/signup etc
+
+
+
 - views/: Contains HTML templates for rendering frontend pages.
 - public/: Contains static assets such as CSS and JavaScript files.
 

@@ -1,43 +1,27 @@
 const {getUser} = require('../service/auth');
 
-async function restrictToLoggedinUserOnly(req, res, next){
-    
-   //Get UUID from cookies and if its not present then redirect to login page 
-    // const uuid = req.cookies.uid;
+async function checkForAuthentication(req, res, next){
+    const tokenCookie = req.cookies?.token;
 
-    //Get user match with UUID and none user exist then redirect to login page
-    // const user = getUser(uuid);
-    // if(!user) return res.redirect('/login');
+    req.user = null;
+    if(!tokenCookie){
+        return next();
+    }
 
-    //Get Auth header's value where our token came in req
-    const userUid = req.headers['authorization']
-    if(!userUid) return res.redirect('/login');
-    const token = userUid.split('Bearer ')[1]; //Auth: "Bearer <token>"  format of auth in headers
-
-    const user = getUser(token);// sent to jwt.verify to get user data
-    if(!user) return res.redirect('/login');
-    
-    //Pass user details to home page, /url route
-    req.user = user;
-    next();
-}
-
-async function checkBasicAuth(req, res, next){
-    //use below while you using cookies
-    // const uuid = req.cookies?.uid;
-    // const user = getUser(uuid);
-
-    //auth through headers
-    const userUid = req.headers['authorization']
-    const token = userUid.split('Bearer ')[1]; //Auth: "Bearer <token>"  format of auth in headers
+    //Validate authorization token
+    const token = tokenCookie; 
     const user = getUser(token);
-
-
-
-
-   
     req.user = user;
     next();
 }
 
-module.exports = { restrictToLoggedinUserOnly, checkBasicAuth }
+//It restrict user according to their roles to access specific page
+function restrictTo(roles = []){
+    return function(req, res, next){
+        if(!req.user) return res.redirect("/login");
+        if(!roles.includes(req.user.role)) return res.end("UnAuthorized to access this page");
+
+        return next();
+    };
+}
+module.exports = { checkForAuthentication, restrictTo }

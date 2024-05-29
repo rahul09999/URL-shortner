@@ -23,7 +23,7 @@ async function handleUserSignUp(req, res) {
 async function handleUserLogin(req, res) {
     //Store body(data) coming from frontend
     const {email, password } = req.body;
-    console.log("I am here")
+    console.log("I am here in  handleUserLogin")
     const user = await USER.findOne({ email , password });
 
     //If not found then return it to login page
@@ -41,11 +41,11 @@ async function handleUserLogin(req, res) {
 
     const token = setUser(user);
     console.log(token)
-    // res.cookie("uid", token);
+    res.cookie("token", token);
     //Redirect to Home page
     // return res.redirect('/');
 
-    return res.json({token})
+    return res.redirect("/");
 }
 
 module.exports = {
