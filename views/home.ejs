@@ -1,151 +1,186 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home-page</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Asap:wght@700&family=Asap:ital,wght@0,400;0,500;1,500&display=swap');
-
-*{
-  box-sizing:border-box;
-}
-body{
-  margin:0;
-  font-family:asap,Arial,Helvetica, serif;
-  display:flex;
-  height:100vh;
-  justify-content:center;
-  background:#f4f4f4;
-}
-.container{
-  margin:1.5em;
-  text-align:center;
-  width:700px;
-  max-width:100%;
-}
-.card{
-  margin:3em 0;
-  background:#fff;
-  padding:1.5em;
-  border-radius:5px;
-  box-shadow:0 2px 4px #ddd;
-}
-.title{
-  margin:0;
-  font-size:49px;
-  font-weight:700;
-  color:#0186da;
-  text-shadow:0 2px 2px #0186da;
-}
-.sub-title{
-  font-size:36px;
-  
-  font-weight:700;
-  color:#505050;
-  margin:0 0 1em 0 ;
-}
-form{
-  display:flex;
-  padding:0 1em 1em 1em;
-}
-.url-input{
-  flex:1;
-  height:3em;
-  padding:0 1em;
-  font-size:17px;
-  color:#666;
-  border-radius:5px;
-  border:1px solid #bbb;
-  border-bottom-right-radius:0;
-  border-top-right-radius:0;
-}
-.shorten-btn{
-  cursor:pointer;
-  background:#2c87c5;
-  color:#fff;
-  font-size:17px;
-  font-style:bold;
-  padding:0.5em;
-  border:0;
-  border-radius:5px;
-  border-bottom-left-radius:0;
-  border-top-left-radius:0; 
-}
-p{
-  color:#555;
-}
-table {
-    border-collapse: collapse;
-    border: 2px solid rgb(200, 200, 200);
-    letter-spacing: 1px;
-    font-size: 0.8rem;
-}
-
-td,
-th {
-    border: 1px solid rgb(190, 190, 190);
-    padding: 10px 20px;
-}
-
-th {
-    background-color: rgb(235, 235, 235);
-}
-
-td {
-    text-align: center;
-}
-
-tr:nth-child(even) td {
-    background-color: rgb(250, 250, 250);
-}
-
-tr:nth-child(odd) td {
-    background-color: rgb(245, 245, 245);
-}
-
-    </style>
+    <title>Shawwwty - Modern URL Shortener</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
+    <div class="animated-bg"></div>
+    
+    <%- include('partials/header') %>
+    
     <div class="container">
-        <p class="title">Shawwwty</p>
-        <p>Short Your URL</p>
-        <div class="card">
-          <p class="sub-title">Drop your BIG AF URL to be shortened</p>
-          <form action="/url" method="post">
-            <input class="url-input" type="url" placeholder="https://example.com" name="url">
-            <button class="shorten-btn" type="submit">Shorten URL</button>
-          </form>
-            <p>Shawwwty is a free tool to shorten a URL or reduce a link.
-            </br>Use our URL Shortener to create a shortened link making it easy to remember.</p>
+        <div class="hero">
+            <div class="hero-badge">
+                <span>✨ Free Forever</span> · Shorten URLs in seconds
             </div>
-            <div class="url-generate">
-                <% if (locals.id) { %>
-                    <p>URL Generated:- http://localhost:3000/url/<%= id %></p>
-                    <%# console.log(locals.settings.port) %>
-                <% } %>
-            </div>   
-            <div>
-                <h1>Analytics</h1>
-                <table>
-                    <thead>
-                        <th>Sr. no</th>
-                        <th>ShortId</th>
-                        <th>Redirect_Url</th>
-                        <th>Clicks</th>
-                    </thead>
-                    <tbody>
-                        <% urls.forEach((url, index) => { %>
-                         <tr>
-                            <td><%= index + 1 %> </td>
-                            <td><%= url.shortId%> </td>
-                            <td><%= url.redirectUrl %> </td>
-                            <td><%= url.visitedHistory.length %> </td>
-                         </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
-            </div>         
-      </div>
+            <h1>
+                Make Your Links<br>
+                <span class="gradient-text">Short & Beautiful</span>
+            </h1>
+            <p>Transform long, complex URLs into clean, shareable links. Track clicks and analyze your audience with powerful analytics.</p>
+        </div>
+
+        <div class="url-form-container">
+            <form action="/url" method="post" class="url-form" id="urlForm">
+                <div class="input-wrapper">
+                    <input 
+                        type="url" 
+                        name="url" 
+                        class="url-input" 
+                        placeholder="Paste your long URL here..." 
+                        required
+                        autofocus
+                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                </div>
+                <button type="submit" class="shorten-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Shorten URL
+                </button>
+            </form>
+            
+            <div class="result-container <%= typeof id !== 'undefined' && id ? 'show' : '' %>" id="resultContainer">
+                <div class="result-label">Your shortened URL is ready!</div>
+                <div class="result-url">
+                    <input type="text" id="shortUrl" readonly value="<%= typeof id !== 'undefined' && id ? (typeof BASE_URL !== 'undefined' ? BASE_URL : 'http://localhost:3000') + '/url/' + id : '' %>">
+                    <button class="copy-btn" id="copyBtn" type="button" onclick="copyToClipboard()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <% if (urls && urls.length > 0) { %>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number"><%= urls.length %></div>
+                <div class="stat-label">Total Links Created</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number"><%= urls.reduce((acc, url) => acc + (url.visitedHistory ? url.visitedHistory.length : 0), 0) %></div>
+                <div class="stat-label">Total Clicks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number"><%= urls.length > 0 ? Math.round(urls.reduce((acc, url) => acc + (url.visitedHistory ? url.visitedHistory.length : 0), 0) / urls.length * 10) / 10 : 0 %></div>
+                <div class="stat-label">Avg. Clicks per Link</div>
+            </div>
+        </div>
+        <% } %>
+
+        <div class="analytics-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </span>
+                    Your Links
+                </h2>
+            </div>
+            
+            <% if (urls && urls.length > 0) { %>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Short ID</th>
+                                <th>Original URL</th>
+                                <th>Clicks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% urls.forEach((url, index) => { %>
+                                <tr style="animation: fadeInUp 0.4s ease-out <%= index * 0.05 %>s both;">
+                                    <td>
+                                        <span class="index-badge"><%= index + 1 %></span>
+                                    </td>
+                                    <td>
+                                        <span class="short-id">
+                                            <a href="<%= typeof BASE_URL !== 'undefined' ? BASE_URL : 'http://localhost:3000' %>/url/<%= url.shortId %>" target="_blank" rel="noopener">
+                                                <%= url.shortId %>
+                                            </a>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="redirect-url" title="<%= url.redirectUrl %>">
+                                            <%= url.redirectUrl %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="clicks-badge"><%= url.visitedHistory ? url.visitedHistory.length : 0 %></span>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                    </div>
+                    <h3>No links yet</h3>
+                    <p>Start shortening your URLs above and they'll appear here with detailed analytics.</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+        
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+        
+        initTheme();
+
+        // Copy to clipboard function
+        function copyToClipboard() {
+            const shortUrlInput = document.getElementById('shortUrl');
+            shortUrlInput.select();
+            shortUrlInput.setSelectionRange(0, 99999);
+            
+            navigator.clipboard.writeText(shortUrlInput.value).then(() => {
+                const copyBtn = document.getElementById('copyBtn');
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Copied!';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Scroll to result if newly generated
+        <% if (typeof id !== 'undefined' && id) { %>
+        document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        <% } %>
+    </script>
 </body>
 </html>

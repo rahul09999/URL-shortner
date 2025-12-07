@@ -30,6 +30,7 @@ app.set('view engine', 'ejs'); //by default express knows all UI component is pr
 app.use(express.json());
 app.use(express.urlencoded({extended: true})); // This middleware help us to encode form data
 app.use(cookieParser());
+app.use(express.static('public')); // Serve static files from public directory
 app.use(checkForAuthentication);
 
 //Route-middleware
