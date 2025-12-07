@@ -18,11 +18,14 @@ async function handleGenerateNewShortUrl(req, res){
         createdBy: req.user._id, //user comes from ./middleware/auth.js which checks whether user login or not and _id is objectName used by mongo for each new db entries
     })
 
-    //pass URL and shortID
-    const allUrls = await URL.find({})
+    //pass URL and shortID - only fetch URLs created by current user
+    const allUrls = await URL.find({ createdBy: req.user._id })
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
     return res.render('home', { // its goes to home page with property id(which will be in locals object) to render page with data
         id: shortId,
-        urls: allUrls
+        urls: allUrls,
+        BASE_URL: baseUrl,
+        user: req.user
     })
     // return res.json({
     //     id: shortId,
