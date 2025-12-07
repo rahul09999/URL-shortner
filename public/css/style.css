@@ -205,6 +205,20 @@ body {
     background: var(--bg-tertiary);
 }
 
+.nav-links a.btn-primary {
+    color: white !important;
+    -webkit-text-fill-color: white;
+    background: var(--gradient-button);
+    padding: 0.625rem 1.25rem;
+    font-weight: 600;
+}
+
+.nav-links a.btn-primary:hover {
+    color: white !important;
+    background: var(--gradient-button-hover);
+    transform: translateY(-2px);
+}
+
 /* Theme Toggle */
 .theme-toggle {
     width: 44px;
