@@ -65,7 +65,7 @@
         <% if (urls && urls.length > 0) { %>
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number"><%= urls.length %></div>
+                <div class="stat-number"><%= typeof totalUrls !== 'undefined' ? totalUrls : urls.length %></div>
                 <div class="stat-label">Total Links Created</div>
             </div>
             <div class="stat-card">
@@ -104,10 +104,15 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <% 
+                                const pageNum = typeof currentPage !== 'undefined' ? currentPage : 1;
+                                const pageLimit = typeof limit !== 'undefined' ? limit : 10;
+                                const startIndex = (pageNum - 1) * pageLimit;
+                            %>
                             <% urls.forEach((url, index) => { %>
                                 <tr style="animation: fadeInUp 0.4s ease-out <%= index * 0.05 %>s both;" id="url-row-<%= url.shortId %>">
                                     <td>
-                                        <span class="index-badge"><%= index + 1 %></span>
+                                        <span class="index-badge"><%= startIndex + index + 1 %></span>
                                     </td>
                                     <td>
                                         <span class="short-id">
@@ -136,6 +141,79 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Pagination Controls -->
+                <% if (typeof totalPages !== 'undefined' && totalPages > 1) { 
+                    const paginationPage = typeof currentPage !== 'undefined' ? currentPage : 1;
+                    const paginationLimit = typeof limit !== 'undefined' ? limit : 10;
+                %>
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        Showing <%= ((paginationPage - 1) * paginationLimit) + 1 %> - <%= Math.min(paginationPage * paginationLimit, totalUrls) %> of <%= totalUrls %> links
+                    </div>
+                    <div class="pagination-buttons">
+                        <% if (paginationPage > 1) { %>
+                            <a href="?page=<%= paginationPage - 1 %>&limit=<%= paginationLimit %>" class="pagination-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                                Previous
+                            </a>
+                        <% } else { %>
+                            <span class="pagination-btn disabled">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                                Previous
+                            </span>
+                        <% } %>
+
+                        <div class="pagination-numbers">
+                            <% 
+                                let startPage = Math.max(1, paginationPage - 2);
+                                let endPage = Math.min(totalPages, paginationPage + 2);
+                                
+                                if (startPage > 1) { %>
+                                    <a href="?page=1&limit=<%= paginationLimit %>" class="pagination-number">1</a>
+                                    <% if (startPage > 2) { %>
+                                        <span class="pagination-ellipsis">...</span>
+                                    <% } %>
+                                <% }
+                                
+                                for (let i = startPage; i <= endPage; i++) { %>
+                                    <% if (i === paginationPage) { %>
+                                        <span class="pagination-number active"><%= i %></span>
+                                    <% } else { %>
+                                        <a href="?page=<%= i %>&limit=<%= paginationLimit %>" class="pagination-number"><%= i %></a>
+                                    <% } %>
+                                <% }
+                                
+                                if (endPage < totalPages) { %>
+                                    <% if (endPage < totalPages - 1) { %>
+                                        <span class="pagination-ellipsis">...</span>
+                                    <% } %>
+                                    <a href="?page=<%= totalPages %>&limit=<%= paginationLimit %>" class="pagination-number"><%= totalPages %></a>
+                                <% } %>
+                        </div>
+
+                        <% if (paginationPage < totalPages) { %>
+                            <a href="?page=<%= paginationPage + 1 %>&limit=<%= paginationLimit %>" class="pagination-btn">
+                                Next
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        <% } else { %>
+                            <span class="pagination-btn disabled">
+                                Next
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </span>
+                        <% } %>
+                    </div>
+                </div>
+                <% } %>
             <% } else { %>
                 <div class="empty-state">
                     <div class="empty-icon">

@@ -1,5 +1,6 @@
 const nanoid = require('nanoid');
 const {URL} = require('../models/url');
+const { paginate } = require('../utils/pagination');
 
 async function handleGenerateNewShortUrl(req, res){
     try {
@@ -26,14 +27,24 @@ async function handleGenerateNewShortUrl(req, res){
             createdBy: req.user._id, //user comes from ./middleware/auth.js which checks whether user login or not and _id is objectName used by mongo for each new db entries
         })
 
-        //pass URL and shortID - only fetch URLs created by current user
-        const allUrls = await URL.find({ createdBy: req.user._id })
+        // Fetch URLs with pagination (first page, 10 per page), sorted by createdAt descending
+        const { items: allUrls, pagination } = await paginate({
+            query: URL.find({ createdBy: req.user._id }),
+            countQuery: URL.countDocuments({ createdBy: req.user._id }),
+            page: 1,
+            limit: 10
+        });
+
         const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
         return res.render('home', { // its goes to home page with property id(which will be in locals object) to render page with data
             id: shortId,
             urls: allUrls,
             BASE_URL: baseUrl,
-            user: req.user
+            user: req.user,
+            currentPage: pagination.currentPage,
+            totalPages: pagination.totalPages,
+            totalUrls: pagination.totalItems,
+            limit: pagination.itemsPerPage
         })
         // return res.json({
         //     id: shortId,
