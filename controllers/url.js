@@ -1,6 +1,7 @@
 const nanoid = require('nanoid');
 const {URL} = require('../models/url');
 const { paginate } = require('../utils/pagination');
+const { anonymizeIP, parseUserAgent, getClientIP, getReferrer, getLocationFromIP } = require('../utils/analytics');
 
 async function handleGenerateNewShortUrl(req, res){
     try {
@@ -35,17 +36,16 @@ async function handleGenerateNewShortUrl(req, res){
             limit: 10
         });
 
-        const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
-        return res.render('home', { // its goes to home page with property id(which will be in locals object) to render page with data
-            id: shortId,
-            urls: allUrls,
-            BASE_URL: baseUrl,
-            user: req.user,
-            currentPage: pagination.currentPage,
-            totalPages: pagination.totalPages,
-            totalUrls: pagination.totalItems,
-            limit: pagination.itemsPerPage
-        })
+        const result = await URL.aggregate([
+            { $match: { createdBy: req.user._id } },
+            { $project: { clicks: { $size: { $ifNull: ["$visitedHistory", []] } } } },
+            { $group: { _id: null, totalClicks: { $sum: "$clicks" }, urlCount: { $sum: 1 } } }
+        ]);
+        const totalClicks = result[0]?.totalClicks || 0;
+        const avgClicks = pagination.totalItems > 0 ? Math.round((totalClicks / pagination.totalItems) * 10) / 10 : 0;
+
+        // Redirect to dashboard with the new shortId
+        return res.redirect(`/?id=${shortId}`);
         // return res.json({
         //     id: shortId,
         // })
@@ -69,9 +69,40 @@ async function handleAnalytics(req, res){
             });
         }
 
+        // Calculate analytics summary
+        const analytics = data.visitedHistory || [];
+        const deviceStats = {};
+        const browserStats = {};
+        const countryStats = {};
+        const referrerStats = {};
+        
+        analytics.forEach(visit => {
+            // Device statistics
+            const device = visit.deviceType || 'Unknown';
+            deviceStats[device] = (deviceStats[device] || 0) + 1;
+            
+            // Browser statistics
+            const browser = visit.browserType || 'Unknown';
+            browserStats[browser] = (browserStats[browser] || 0) + 1;
+            
+            // Country statistics
+            const country = visit.location?.country || 'Unknown';
+            countryStats[country] = (countryStats[country] || 0) + 1;
+            
+            // Referrer statistics
+            const ref = visit.referrer || 'Direct';
+            referrerStats[ref] = (referrerStats[ref] || 0) + 1;
+        });
+
         res.json({
-            totalClicks: data.visitedHistory.length,
-            analytics: data.visitedHistory,
+            totalClicks: analytics.length,
+            analytics: analytics,
+            summary: {
+                deviceStats,
+                browserStats,
+                countryStats,
+                referrerStats
+            }
         })
     } catch (error) {
         console.error('Error fetching analytics:', error);
@@ -87,7 +118,34 @@ async function handleUrlRedirect(req, res){
         const shortId = req.params.shortId;
         console.log(shortId);
 
-        //Get shortId and update visited history
+        // Collect analytics data
+        const clientIP = getClientIP(req);
+        const anonymizedIP = anonymizeIP(clientIP);
+        const userAgent = req.headers['user-agent'] || '';
+        const referrer = getReferrer(req);
+        const { deviceType, browserType } = parseUserAgent(userAgent);
+        
+        // Get location (try to get it, but don't block redirect if it fails)
+        let location = {
+            country: 'Unknown',
+            city: 'Unknown',
+            region: 'Unknown'
+        };
+        
+        // Try to get location with a short timeout
+        try {
+            const locationPromise = getLocationFromIP(clientIP);
+            const timeoutPromise = new Promise((resolve) => 
+                setTimeout(() => resolve(location), 1000)
+            );
+            location = await Promise.race([locationPromise, timeoutPromise]);
+        } catch (error) {
+            // If location fetch fails, use default unknown location
+            console.error('Error getting location:', error.message);
+        }
+
+        //Get shortId and update visited history with analytics data
+        const timestamp = Date.now();
         const entry = await URL.findOneAndUpdate(
             {
                 shortId,
@@ -95,7 +153,13 @@ async function handleUrlRedirect(req, res){
             {
                 $push: { // visitedHistory is array, so pushing new array on every click
                     visitedHistory: {
-                        timestamp: Date.now(),
+                        timestamp: timestamp,
+                        ipAddress: anonymizedIP,
+                        userAgent: userAgent,
+                        referrer: referrer,
+                        location: location,
+                        deviceType: deviceType,
+                        browserType: browserType,
                     }
                 }
             })

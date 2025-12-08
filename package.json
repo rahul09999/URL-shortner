@@ -20,6 +20,7 @@
     "mongoose": "^8.1.1",
     "nanoid": "^3.3.4",
     "nodemon": "^3.0.3",
+    "ua-parser-js": "^1.0.41",
     "uuid": "^9.0.1"
   }
 }

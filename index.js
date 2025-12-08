@@ -61,11 +61,6 @@ app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
-//routes-
-// Method- Post , route-> /url => to get shortid
-// Method- Get, route-> /:shortUrl => to redirect to ur given link
-// Method- Get, route-> /url/analytics/:id => to get analytics of ur shortUrl clicks
-
 //To-do
 //Make sure when you send url shortner link it should land on / route instead of /url
 //And url generate link only while clicking on that button and not on refresh of page

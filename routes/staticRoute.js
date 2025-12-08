@@ -5,6 +5,19 @@ const { restrictTo } = require('../middlewares/middleAuth');
 const { paginate } = require('../utils/pagination');
 const router = express.Router();
 
+async function getClickStats(matchFilter = {}) {
+    const result = await URL.aggregate([
+        { $match: matchFilter },
+        { $project: { clicks: { $size: { $ifNull: ["$visitedHistory", []] } } } },
+        { $group: { _id: null, totalClicks: { $sum: "$clicks" }, urlCount: { $sum: 1 } } }
+    ]);
+
+    const totalClicks = result[0]?.totalClicks || 0;
+    const urlCount = result[0]?.urlCount || 0;
+    const avgClicks = urlCount > 0 ? Math.round((totalClicks / urlCount) * 10) / 10 : 0;
+
+    return { totalClicks, avgClicks };
+}
 
 router.get('/admin/urls', restrictTo(["ADMIN"]) ,async (req, res) => {
     try {
@@ -15,6 +28,7 @@ router.get('/admin/urls', restrictTo(["ADMIN"]) ,async (req, res) => {
             limit: req.query.limit
         });
 
+        const { totalClicks, avgClicks } = await getClickStats({});
         const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
         return res.render('home', {
             urls: allUrls,
@@ -23,7 +37,10 @@ router.get('/admin/urls', restrictTo(["ADMIN"]) ,async (req, res) => {
             currentPage: pagination.currentPage,
             totalPages: pagination.totalPages,
             totalUrls: pagination.totalItems,
-            limit: pagination.itemsPerPage
+            limit: pagination.itemsPerPage,
+            adminView: true,
+            totalClicks,
+            avgClicks,
         });
     } catch (error) {
         console.error('Error fetching admin URLs:', error);
@@ -49,6 +66,7 @@ router.get('/', restrictTo(["NORMAL", "ADMIN"]) ,async (req, res) => {
             limit: req.query.limit
         });
 
+        const { totalClicks, avgClicks } = await getClickStats({ createdBy: req.user._id });
         const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
         return res.render('home', {
             urls: allUrls,
@@ -57,7 +75,11 @@ router.get('/', restrictTo(["NORMAL", "ADMIN"]) ,async (req, res) => {
             currentPage: pagination.currentPage,
             totalPages: pagination.totalPages,
             totalUrls: pagination.totalItems,
-            limit: pagination.itemsPerPage
+            limit: pagination.itemsPerPage,
+            adminView: false,
+            totalClicks,
+            avgClicks,
+            id: req.query.id, // show newly created shortId after redirect
         });
     } catch (error) {
         console.error('Error fetching user URLs:', error);
