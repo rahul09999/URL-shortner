@@ -14,7 +14,27 @@ const urlSchema = new mongoose.Schema(
         visitedHistory: [{
             timestamp: {
                 type: Number,
-            }
+            },
+            ipAddress: {
+                type: String, // Anonymized IP address
+            },
+            userAgent: {
+                type: String,
+            },
+            referrer: {
+                type: String,
+            },
+            location: {
+                country: String,
+                city: String,
+                region: String,
+            },
+            deviceType: {
+                type: String, // mobile, desktop, tablet, etc.
+            },
+            browserType: {
+                type: String, // Chrome, Firefox, Safari, etc.
+            },
         }],
         createdBy: {
             type: mongoose.Schema.Types.ObjectId, //type is objectId that mongo creates

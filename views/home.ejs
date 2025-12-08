@@ -65,15 +65,15 @@
         <% if (urls && urls.length > 0) { %>
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number"><%= urls.length %></div>
+                <div class="stat-number"><%= typeof totalUrls !== 'undefined' ? totalUrls : urls.length %></div>
                 <div class="stat-label">Total Links Created</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number"><%= urls.reduce((acc, url) => acc + (url.visitedHistory ? url.visitedHistory.length : 0), 0) %></div>
+                <div class="stat-number"><%= typeof totalClicks !== 'undefined' ? totalClicks : urls.reduce((acc, url) => acc + (url.visitedHistory ? url.visitedHistory.length : 0), 0) %></div>
                 <div class="stat-label">Total Clicks</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number"><%= urls.length > 0 ? Math.round(urls.reduce((acc, url) => acc + (url.visitedHistory ? url.visitedHistory.length : 0), 0) / urls.length * 10) / 10 : 0 %></div>
+                <div class="stat-number"><%= typeof avgClicks !== 'undefined' ? avgClicks : (urls.length > 0 ? Math.round(urls.reduce((acc, url) => acc + (url.visitedHistory ? url.visitedHistory.length : 0), 0) / urls.length * 10) / 10 : 0) %></div>
                 <div class="stat-label">Avg. Clicks per Link</div>
             </div>
         </div>
@@ -87,7 +87,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                     </span>
-                    Your Links
+                    <%= typeof adminView !== 'undefined' && adminView ? 'All Links (Admin)' : 'Your Links' %>
                 </h2>
             </div>
             
@@ -100,13 +100,19 @@
                                 <th>Short ID</th>
                                 <th>Original URL</th>
                                 <th>Clicks</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
+                            <% 
+                                const pageNum = typeof currentPage !== 'undefined' ? currentPage : 1;
+                                const pageLimit = typeof limit !== 'undefined' ? limit : 10;
+                                const startIndex = (pageNum - 1) * pageLimit;
+                            %>
                             <% urls.forEach((url, index) => { %>
-                                <tr style="animation: fadeInUp 0.4s ease-out <%= index * 0.05 %>s both;">
+                                <tr id="url-row-<%= url.shortId %>">
                                     <td>
-                                        <span class="index-badge"><%= index + 1 %></span>
+                                        <span class="index-badge"><%= startIndex + index + 1 %></span>
                                     </td>
                                     <td>
                                         <span class="short-id">
@@ -123,11 +129,98 @@
                                     <td>
                                         <span class="clicks-badge"><%= url.visitedHistory ? url.visitedHistory.length : 0 %></span>
                                     </td>
+                                    <td>
+                                        <div style="display: flex; gap: 8px; align-items: center;">
+                                            <button class="analytics-btn" onclick="viewAnalytics('<%= url.shortId %>')" title="View detailed analytics">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                                </svg>
+                                            </button>
+                                            <button class="delete-btn" onclick="deleteShortUrl('<%= url.shortId %>')" title="Delete this short URL">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
                             <% }) %>
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Pagination Controls -->
+                <% if (typeof totalPages !== 'undefined' && totalPages > 1) { 
+                    const paginationPage = typeof currentPage !== 'undefined' ? currentPage : 1;
+                    const paginationLimit = typeof limit !== 'undefined' ? limit : 10;
+                %>
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        Showing <%= ((paginationPage - 1) * paginationLimit) + 1 %> - <%= Math.min(paginationPage * paginationLimit, totalUrls) %> of <%= totalUrls %> links
+                    </div>
+                    <div class="pagination-buttons">
+                        <% if (paginationPage > 1) { %>
+                            <a href="?page=<%= paginationPage - 1 %>&limit=<%= paginationLimit %>" class="pagination-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                                Previous
+                            </a>
+                        <% } else { %>
+                            <span class="pagination-btn disabled">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                                Previous
+                            </span>
+                        <% } %>
+
+                        <div class="pagination-numbers">
+                            <% 
+                                let startPage = Math.max(1, paginationPage - 2);
+                                let endPage = Math.min(totalPages, paginationPage + 2);
+                                
+                                if (startPage > 1) { %>
+                                    <a href="?page=1&limit=<%= paginationLimit %>" class="pagination-number">1</a>
+                                    <% if (startPage > 2) { %>
+                                        <span class="pagination-ellipsis">...</span>
+                                    <% } %>
+                                <% }
+                                
+                                for (let i = startPage; i <= endPage; i++) { %>
+                                    <% if (i === paginationPage) { %>
+                                        <span class="pagination-number active"><%= i %></span>
+                                    <% } else { %>
+                                        <a href="?page=<%= i %>&limit=<%= paginationLimit %>" class="pagination-number"><%= i %></a>
+                                    <% } %>
+                                <% }
+                                
+                                if (endPage < totalPages) { %>
+                                    <% if (endPage < totalPages - 1) { %>
+                                        <span class="pagination-ellipsis">...</span>
+                                    <% } %>
+                                    <a href="?page=<%= totalPages %>&limit=<%= paginationLimit %>" class="pagination-number"><%= totalPages %></a>
+                                <% } %>
+                        </div>
+
+                        <% if (paginationPage < totalPages) { %>
+                            <a href="?page=<%= paginationPage + 1 %>&limit=<%= paginationLimit %>" class="pagination-btn">
+                                Next
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        <% } else { %>
+                            <span class="pagination-btn disabled">
+                                Next
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </span>
+                        <% } %>
+                    </div>
+                </div>
+                <% } %>
             <% } else { %>
                 <div class="empty-state">
                     <div class="empty-icon">
@@ -139,6 +232,19 @@
                     <p>Start shortening your URLs above and they'll appear here with detailed analytics.</p>
                 </div>
             <% } %>
+        </div>
+    </div>
+
+    <!-- Analytics Modal -->
+    <div id="analyticsModal" class="analytics-modal">
+        <div class="analytics-modal-content">
+            <div class="analytics-modal-header">
+                <h2>Analytics Details</h2>
+                <button class="analytics-modal-close" onclick="closeAnalyticsModal()">&times;</button>
+            </div>
+            <div class="analytics-modal-body" id="analyticsModalBody">
+                <div class="analytics-loading">Loading analytics...</div>
+            </div>
         </div>
     </div>
 
@@ -178,9 +284,186 @@
         }
 
         // Scroll to result if newly generated
-        <% if (typeof id !== 'undefined' && id) { %>
-        document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        <% } %>
+        const resultContainer = document.getElementById('resultContainer');
+        if (resultContainer && resultContainer.classList.contains('show')) {
+            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Delete short URL function
+        async function deleteShortUrl(shortId) {
+            if (!confirm('Are you sure you want to delete this short URL? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/url/${shortId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    // Remove the row from the table
+                    const row = document.getElementById(`url-row-${shortId}`);
+                    if (row) {
+                        row.style.transition = 'opacity 0.3s ease-out';
+                        row.style.opacity = '0';
+                        setTimeout(() => {
+                            row.remove();
+                            // Reload the page to update the stats
+                            window.location.reload();
+                        }, 300);
+                    }
+                } else {
+                    const data = await response.json();
+                    alert(data.error || 'Failed to delete short URL');
+                }
+            } catch (error) {
+                console.error('Error deleting short URL:', error);
+                alert('An error occurred while deleting the short URL. Please try again.');
+            }
+        }
+
+        // View analytics function
+        async function viewAnalytics(shortId) {
+            const modal = document.getElementById('analyticsModal');
+            const modalBody = document.getElementById('analyticsModalBody');
+            
+            modal.style.display = 'flex';
+            modalBody.innerHTML = '<div class="analytics-loading">Loading analytics...</div>';
+            
+            try {
+                const response = await fetch(`/url/analytics/${shortId}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to fetch analytics');
+                }
+                
+                renderAnalytics(data, shortId);
+            } catch (error) {
+                console.error('Error fetching analytics:', error);
+                modalBody.innerHTML = `<div class="analytics-error">Error loading analytics: ${error.message}</div>`;
+            }
+        }
+
+        // Close analytics modal
+        function closeAnalyticsModal() {
+            const modal = document.getElementById('analyticsModal');
+            modal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('analyticsModal');
+            if (event.target === modal) {
+                closeAnalyticsModal();
+            }
+        }
+
+        // Render analytics data
+        function renderAnalytics(data, shortId) {
+            const modalBody = document.getElementById('analyticsModalBody');
+            const analytics = data.analytics || [];
+            const summary = data.summary || {};
+            
+            let html = `
+                <div class="analytics-container">
+                    <div class="analytics-header-info">
+                        <h3>Short ID: <code>${shortId}</code></h3>
+                        <div class="analytics-total-clicks">Total Clicks: <strong>${data.totalClicks}</strong></div>
+                    </div>
+                    
+                    ${data.totalClicks > 0 ? `
+                    <div class="analytics-summary">
+                        <h4>Summary Statistics</h4>
+                        <div class="analytics-summary-grid">
+                            <div class="analytics-summary-card">
+                                <h5>Devices</h5>
+                                <div class="analytics-stats-list">
+                                    ${Object.entries(summary.deviceStats || {}).map(([device, count]) => 
+                                        `<div class="analytics-stat-item">
+                                            <span class="stat-label">${device.charAt(0).toUpperCase() + device.slice(1)}</span>
+                                            <span class="stat-value">${count}</span>
+                                        </div>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            <div class="analytics-summary-card">
+                                <h5>Browsers</h5>
+                                <div class="analytics-stats-list">
+                                    ${Object.entries(summary.browserStats || {}).map(([browser, count]) => 
+                                        `<div class="analytics-stat-item">
+                                            <span class="stat-label">${browser}</span>
+                                            <span class="stat-value">${count}</span>
+                                        </div>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            <div class="analytics-summary-card">
+                                <h5>Countries</h5>
+                                <div class="analytics-stats-list">
+                                    ${Object.entries(summary.countryStats || {}).slice(0, 10).map(([country, count]) => 
+                                        `<div class="analytics-stat-item">
+                                            <span class="stat-label">${country}</span>
+                                            <span class="stat-value">${count}</span>
+                                        </div>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-details">
+                        <h4>Click History</h4>
+                        <div class="analytics-table-container">
+                            <table class="analytics-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date & Time</th>
+                                        <th>IP Address</th>
+                                        <th>Location</th>
+                                        <th>Device</th>
+                                        <th>Browser</th>
+                                        <th>Referrer</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${analytics.slice().reverse().map(visit => {
+                                        const date = new Date(visit.timestamp);
+                                        const location = visit.location ? 
+                                            `${visit.location.city || 'Unknown'}, ${visit.location.region || 'Unknown'}, ${visit.location.country || 'Unknown'}` : 
+                                            'Unknown';
+                                        const referrer = visit.referrer ? 
+                                            (visit.referrer.length > 50 ? visit.referrer.substring(0, 50) + '...' : visit.referrer) : 
+                                            'Direct';
+                                        
+                                        return `
+                                            <tr>
+                                                <td>${date.toLocaleString()}</td>
+                                                <td><code>${visit.ipAddress || 'Unknown'}</code></td>
+                                                <td>${location}</td>
+                                                <td><span class="device-badge device-${(visit.deviceType || 'unknown').toLowerCase()}">${visit.deviceType || 'Unknown'}</span></td>
+                                                <td>${visit.browserType || 'Unknown'}</td>
+                                                <td title="${visit.referrer || 'Direct'}">${referrer}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    ` : `
+                    <div class="analytics-empty">
+                        <p>No analytics data available yet. Start sharing your link to see analytics!</p>
+                    </div>
+                    `}
+                </div>
+            `;
+            
+            modalBody.innerHTML = html;
+        }
     </script>
 </body>
 </html>

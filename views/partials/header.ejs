@@ -4,6 +4,9 @@
         <ul class="nav-links">
             <% if (typeof user !== 'undefined' && user) { %>
                 <li><a href="/">Dashboard</a></li>
+                <% if (user.role === 'ADMIN') { %>
+                    <li><a href="/admin/urls">Admin URLs</a></li>
+                <% } %>
                 <li><a href="/user/logout">Logout</a></li>
             <% } else { %>
                 <li><a href="/login">Login</a></li>

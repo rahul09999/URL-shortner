@@ -1,11 +1,23 @@
 const express = require('express');
 const app = express();
 const cookieParser = require('cookie-parser')
+const rateLimit = require('express-rate-limit');
 const { mongooseConnect } = require('./connect');
 const { URL } = require('./models/url');
 require('dotenv/config');
 const mongo_connect = process.env.MONGO_CONNECT; //Add your own DB
 const port = process.env.PORT || 3000;
+
+// Global rate limiter: 40 requests per minute per IP
+const generalLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 40, // limit each IP to 40 requests per windowMs
+    message: {
+        error: 'Too many requests from this IP, please try again after a minute.'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
 
 //Routes
 const urlRoute = require('./routes/url');
@@ -31,6 +43,10 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true})); // This middleware help us to encode form data
 app.use(cookieParser());
 app.use(express.static('public')); // Serve static files from public directory
+
+// Apply general rate limiter to all routes
+app.use(generalLimiter);
+
 app.use(checkForAuthentication);
 
 //Route-middleware
@@ -44,11 +60,6 @@ app.use('/user', userRoute);
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
-
-//routes-
-// Method- Post , route-> /url => to get shortid
-// Method- Get, route-> /:shortUrl => to redirect to ur given link
-// Method- Get, route-> /url/analytics/:id => to get analytics of ur shortUrl clicks
 
 //To-do
 //Make sure when you send url shortner link it should land on / route instead of /url
