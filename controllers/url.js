@@ -1,7 +1,7 @@
 const nanoid = require('nanoid');
 const {URL} = require('../models/url');
 const { paginate } = require('../utils/pagination');
-const { anonymizeIP, parseUserAgent, getClientIP, getReferrer, getLocationFromIP } = require('../utils/analytics');
+const { parseUserAgent, getClientIP, getReferrer, getLocationFromIP } = require('../utils/analytics');
 
 async function handleGenerateNewShortUrl(req, res){
     try {
@@ -116,11 +116,9 @@ async function handleAnalytics(req, res){
 async function handleUrlRedirect(req, res){
     try {
         const shortId = req.params.shortId;
-        console.log(shortId);
 
         // Collect analytics data
         const clientIP = getClientIP(req);
-        const anonymizedIP = anonymizeIP(clientIP);
         const userAgent = req.headers['user-agent'] || '';
         const referrer = getReferrer(req);
         const { deviceType, browserType } = parseUserAgent(userAgent);
@@ -154,7 +152,7 @@ async function handleUrlRedirect(req, res){
                 $push: { // visitedHistory is array, so pushing new array on every click
                     visitedHistory: {
                         timestamp: timestamp,
-                        ipAddress: anonymizedIP,
+                        ipAddress: clientIP,
                         userAgent: userAgent,
                         referrer: referrer,
                         location: location,
@@ -163,13 +161,13 @@ async function handleUrlRedirect(req, res){
                     }
                 }
             })
-            console.log(entry);
             if(entry){
                 res.redirect(entry.redirectUrl);
             }
             else{
                 res.status(404).send('No entry found for the given URL');
             }
+        
     } catch (error) {
         console.error('Error redirecting URL:', error);
         return res.status(500).send('Internal server error. Please try again later.');

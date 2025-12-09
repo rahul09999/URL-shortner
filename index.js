@@ -39,6 +39,10 @@ app.set('view engine', 'ejs'); //by default express knows all UI component is pr
 //what if folder name is not view? Just Add below syntax
 //app.set('views', path.resolve("./YourFolderName") // YourFolderName -> where ur UI stuffs there
 
+// 1 means "trust the first proxy hop". 
+// This is perfect for Heroku, Vercel, Nginx, or local testing with headers.
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(express.urlencoded({extended: true})); // This middleware help us to encode form data
 app.use(cookieParser());
