@@ -5,7 +5,7 @@ const rateLimit = require('express-rate-limit');
 const { mongooseConnect } = require('./connect');
 const { URL } = require('./models/url');
 require('dotenv/config');
-const mongo_connect = process.env.MONGO_CONNECT; //Add your own DB
+const mongoUri = process.env.MONGODB_URI || process.env.MONGO_CONNECT; // prefer Heroku/Atlas var
 const port = process.env.PORT || 3000;
 
 // Global rate limiter: 40 requests per minute per IP
@@ -27,7 +27,7 @@ const userRoute = require('./routes/user');
 const { checkForAuthentication, restrictTo } = require('./middlewares/middleAuth'); 
 
 //Mongo-Connection
-mongooseConnect(`${mongo_connect}/url-shortner`)
+mongooseConnect(`${mongoUri}/url-shortner`)
 .then(() => console.log("MongoDB is connected..."))
 .catch((err) => {
     console.log(err);
