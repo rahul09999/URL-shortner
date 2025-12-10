@@ -54,7 +54,7 @@ app.use(generalLimiter);
 app.use(checkForAuthentication);
 
 //Route-middleware
-app.use('/url', restrictTo(["NORMAL", "ADMIN"]), urlRoute); //if we need to go /url route then we need an UUID which means only login user can access that
+app.use('/url', restrictTo(["NORMAL", "ADMIN"]), urlRoute);
 app.use('/', staticRoute);
 app.use('/user', userRoute);
 
@@ -64,9 +64,3 @@ app.use('/user', userRoute);
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
-
-//To-do
-//Make sure when you send url shortner link it should land on / route instead of /url
-//And url generate link only while clicking on that button and not on refresh of page
-//Auth-
-//Schema, login/signup page and route -> Generate sessionUID -> store it in form of cookies -> check and give response according -> generate analytics for individually
