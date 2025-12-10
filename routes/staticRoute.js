@@ -3,6 +3,7 @@ const express = require('express');
 const {URL} = require('../models/url');
 const { restrictTo } = require('../middlewares/middleAuth');
 const { paginate } = require('../utils/pagination');
+const USER = require('../models/user');
 const router = express.Router();
 const mongoose = require('mongoose');
 
@@ -27,14 +28,24 @@ async function getClickStats(matchFilter = {}) {
 
 router.get('/admin/urls', restrictTo(["ADMIN"]) ,async (req, res) => {
     try {
+        const { userId } = req.query;
+        let matchFilter = {};
+        let filteredUser = null;
+
+        if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+            const userObjectId = new mongoose.Types.ObjectId(userId);
+            matchFilter = { createdBy: userObjectId };
+            filteredUser = await USER.findById(userObjectId).select('name email').lean();
+        }
+
         const { items: allUrls, pagination } = await paginate({
-            query: URL.find({}),
-            countQuery: URL.countDocuments({}),
+            query: URL.find(matchFilter).populate('createdBy', 'name email'),
+            countQuery: URL.countDocuments(matchFilter),
             page: req.query.page,
             limit: req.query.limit
         });
 
-        const { totalClicks, avgClicks } = await getClickStats({});
+        const { totalClicks, avgClicks } = await getClickStats(matchFilter);
         const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
         return res.render('home', {
             urls: allUrls,
@@ -45,6 +56,8 @@ router.get('/admin/urls', restrictTo(["ADMIN"]) ,async (req, res) => {
             totalUrls: pagination.totalItems,
             limit: pagination.itemsPerPage,
             adminView: true,
+            filteredUserId: userId || null,
+            filteredUser,
             totalClicks,
             avgClicks,
         });
@@ -60,7 +73,10 @@ router.get('/admin/urls', restrictTo(["ADMIN"]) ,async (req, res) => {
             totalUrls: 0,
             limit: 10,
             totalClicks: 0,
-            avgClicks: 0
+            avgClicks: 0,
+            adminView: true,
+            filteredUserId: null,
+            filteredUser: null,
         });
     }
 })
@@ -105,7 +121,10 @@ router.get('/', restrictTo(["NORMAL", "ADMIN"]) ,async (req, res) => {
             totalUrls: 0,
             limit: 10,
             totalClicks: 0,
-            avgClicks: 0
+            avgClicks: 0,
+            adminView: false,
+            filteredUserId: null,
+            filteredUser: null,
         });
     }
 })
