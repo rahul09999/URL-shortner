@@ -5,7 +5,7 @@ const rateLimit = require('express-rate-limit');
 const { mongooseConnect } = require('./connect');
 const { URL } = require('./models/url');
 require('dotenv/config');
-const mongo_connect = process.env.MONGO_CONNECT; //Add your own DB
+const mongoUri = process.env.MONGODB_URI || process.env.MONGO_CONNECT; // prefer Heroku/Atlas var
 const port = process.env.PORT || 3000;
 
 // Global rate limiter: 40 requests per minute per IP
@@ -27,7 +27,7 @@ const userRoute = require('./routes/user');
 const { checkForAuthentication, restrictTo } = require('./middlewares/middleAuth'); 
 
 //Mongo-Connection
-mongooseConnect(`${mongo_connect}/url-shortner`)
+mongooseConnect(`${mongoUri}/url-shortner`)
 .then(() => console.log("MongoDB is connected..."))
 .catch((err) => {
     console.log(err);
@@ -38,6 +38,10 @@ app.set('port', port); // Set the port number as a property of the app object, c
 app.set('view engine', 'ejs'); //by default express knows all UI component is present in views folder, so we dont need to explicity define it
 //what if folder name is not view? Just Add below syntax
 //app.set('views', path.resolve("./YourFolderName") // YourFolderName -> where ur UI stuffs there
+
+// 1 means "trust the first proxy hop". 
+// This is perfect for Heroku, Vercel, Nginx, or local testing with headers.
+app.set('trust proxy', 1);
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true})); // This middleware help us to encode form data
@@ -50,7 +54,7 @@ app.use(generalLimiter);
 app.use(checkForAuthentication);
 
 //Route-middleware
-app.use('/url', restrictTo(["NORMAL", "ADMIN"]), urlRoute); //if we need to go /url route then we need an UUID which means only login user can access that
+app.use('/url', restrictTo(["NORMAL", "ADMIN"]), urlRoute);
 app.use('/', staticRoute);
 app.use('/user', userRoute);
 
@@ -60,9 +64,3 @@ app.use('/user', userRoute);
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
-
-//To-do
-//Make sure when you send url shortner link it should land on / route instead of /url
-//And url generate link only while clicking on that button and not on refresh of page
-//Auth-
-//Schema, login/signup page and route -> Generate sessionUID -> store it in form of cookies -> check and give response according -> generate analytics for individually

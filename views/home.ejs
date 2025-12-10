@@ -89,6 +89,13 @@
                     </span>
                     <%= typeof adminView !== 'undefined' && adminView ? 'All Links (Admin)' : 'Your Links' %>
                 </h2>
+                <% if (adminView && filteredUserId) { %>
+                    <div class="filter-chip">
+                        <span class="filter-chip-label">Filtered by</span>
+                        <span class="filter-chip-value"><%= (filteredUser && (filteredUser.name || filteredUser.email)) ? (filteredUser.name || filteredUser.email) : 'Selected user' %></span>
+                        <a class="filter-chip-clear" href="?" title="Reset user filter">Reset</a>
+                    </div>
+                <% } %>
             </div>
             
             <% if (urls && urls.length > 0) { %>
@@ -98,6 +105,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Short ID</th>
+                                <% if (adminView) { %><th>User</th><% } %>
                                 <th>Original URL</th>
                                 <th>Clicks</th>
                                 <th>Actions</th>
@@ -108,6 +116,7 @@
                                 const pageNum = typeof currentPage !== 'undefined' ? currentPage : 1;
                                 const pageLimit = typeof limit !== 'undefined' ? limit : 10;
                                 const startIndex = (pageNum - 1) * pageLimit;
+                                const userQuery = adminView && filteredUserId ? `&userId=${filteredUserId}` : '';
                             %>
                             <% urls.forEach((url, index) => { %>
                                 <tr id="url-row-<%= url.shortId %>">
@@ -121,6 +130,17 @@
                                             </a>
                                         </span>
                                     </td>
+                                    <% if (adminView) { %>
+                                    <td>
+                                        <% if (url.createdBy && (url.createdBy.name || url.createdBy.email)) { %>
+                                            <a href="?userId=<%= url.createdBy._id %>" class="user-link">
+                                                <%= url.createdBy.name || url.createdBy.email %>
+                                            </a>
+                                        <% } else { %>
+                                            <span class="muted-text">Unknown</span>
+                                        <% } %>
+                                    </td>
+                                    <% } %>
                                     <td>
                                         <span class="redirect-url" title="<%= url.redirectUrl %>">
                                             <%= url.redirectUrl %>
@@ -160,7 +180,7 @@
                     </div>
                     <div class="pagination-buttons">
                         <% if (paginationPage > 1) { %>
-                            <a href="?page=<%= paginationPage - 1 %>&limit=<%= paginationLimit %>" class="pagination-btn">
+                            <a href="?page=<%= paginationPage - 1 %>&limit=<%= paginationLimit %><%= userQuery %>" class="pagination-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                                 </svg>
@@ -181,7 +201,7 @@
                                 let endPage = Math.min(totalPages, paginationPage + 2);
                                 
                                 if (startPage > 1) { %>
-                                    <a href="?page=1&limit=<%= paginationLimit %>" class="pagination-number">1</a>
+                                    <a href="?page=1&limit=<%= paginationLimit %><%= userQuery %>" class="pagination-number">1</a>
                                     <% if (startPage > 2) { %>
                                         <span class="pagination-ellipsis">...</span>
                                     <% } %>
@@ -191,7 +211,7 @@
                                     <% if (i === paginationPage) { %>
                                         <span class="pagination-number active"><%= i %></span>
                                     <% } else { %>
-                                        <a href="?page=<%= i %>&limit=<%= paginationLimit %>" class="pagination-number"><%= i %></a>
+                                        <a href="?page=<%= i %>&limit=<%= paginationLimit %><%= userQuery %>" class="pagination-number"><%= i %></a>
                                     <% } %>
                                 <% }
                                 
@@ -199,12 +219,12 @@
                                     <% if (endPage < totalPages - 1) { %>
                                         <span class="pagination-ellipsis">...</span>
                                     <% } %>
-                                    <a href="?page=<%= totalPages %>&limit=<%= paginationLimit %>" class="pagination-number"><%= totalPages %></a>
+                                    <a href="?page=<%= totalPages %>&limit=<%= paginationLimit %><%= userQuery %>" class="pagination-number"><%= totalPages %></a>
                                 <% } %>
                         </div>
 
                         <% if (paginationPage < totalPages) { %>
-                            <a href="?page=<%= paginationPage + 1 %>&limit=<%= paginationLimit %>" class="pagination-btn">
+                            <a href="?page=<%= paginationPage + 1 %>&limit=<%= paginationLimit %><%= userQuery %>" class="pagination-btn">
                                 Next
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

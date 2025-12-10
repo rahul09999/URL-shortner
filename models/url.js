@@ -16,7 +16,7 @@ const urlSchema = new mongoose.Schema(
                 type: Number,
             },
             ipAddress: {
-                type: String, // Anonymized IP address
+                type: String,
             },
             userAgent: {
                 type: String,
@@ -38,7 +38,7 @@ const urlSchema = new mongoose.Schema(
         }],
         createdBy: {
             type: mongoose.Schema.Types.ObjectId, //type is objectId that mongo creates
-            ref: "users", //ref to user who created that shortId
+            ref: "user", // ref matches USER model name
         },
     
 }, {timestamps: true} ); // it is mongoDB property which automatically add createdAt and updatedAt on our DataBase 

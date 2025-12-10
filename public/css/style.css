@@ -738,6 +738,63 @@ body {
     color: white;
 }
 
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    color: var(--text-primary);
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .filter-chip {
+    background: rgba(99, 102, 241, 0.16);
+    border-color: rgba(99, 102, 241, 0.35);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.filter-chip-label {
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.filter-chip-value {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.filter-chip-clear {
+    padding: 0.25rem 0.65rem;
+    margin-left: 0.25rem;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--primary-100);
+    background: rgba(255, 255, 255, 0.08);
+    text-decoration: none;
+    font-weight: 700;
+    transition: all var(--transition-fast);
+}
+
+[data-theme="dark"] .filter-chip-clear {
+    color: #f8fafc;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.filter-chip-clear:hover {
+    background: var(--gradient-button);
+    color: #fff;
+    border-color: transparent;
+    transform: translateY(-1px);
+}
+
 /* ========================================
    Table Styles
    ======================================== */
@@ -822,6 +879,21 @@ tbody tr:last-child td {
 
 .short-id a:hover::after {
     width: 100%;
+}
+
+.user-link {
+    color: var(--primary-400);
+    font-weight: 700;
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+[data-theme="dark"] .user-link {
+    color: #c7d2fe;
+}
+
+.user-link:hover {
+    color: var(--primary-200);
 }
 
 .redirect-url {
@@ -1567,22 +1639,24 @@ tbody tr:last-child td {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
+    padding: 0.6rem 1.05rem;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
     cursor: pointer;
     text-decoration: none;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all var(--transition-fast);
 }
 
 .pagination-btn:hover:not(.disabled) {
-    background: var(--primary-hover);
+    background: var(--bg-tertiary);
+    border-color: var(--primary-400);
+    color: var(--primary-500);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .pagination-btn.disabled {
@@ -1590,6 +1664,23 @@ tbody tr:last-child td {
     cursor: not-allowed;
     background: var(--bg-secondary);
     color: var(--text-secondary);
+}
+
+[data-theme="dark"] .pagination-btn {
+    background: rgba(255,255,255,0.08);
+    color: #e2e8f0;
+    border-color: rgba(255,255,255,0.16);
+}
+
+[data-theme="dark"] .pagination-btn:hover:not(.disabled) {
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.28);
+    color: #fff;
+}
+
+[data-theme="dark"] .pagination-btn.disabled {
+    background: rgba(255,255,255,0.04);
+    color: rgba(226,232,240,0.45);
 }
 
 .pagination-numbers {
@@ -1607,7 +1698,7 @@ tbody tr:last-child td {
     padding: 0 0.5rem;
     background: var(--bg-secondary);
     color: var(--text-primary);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     text-decoration: none;
     font-size: 0.875rem;
@@ -1617,15 +1708,16 @@ tbody tr:last-child td {
 }
 
 .pagination-number:hover:not(.active) {
-    background: var(--card-bg);
-    border-color: var(--primary);
-    color: var(--primary);
+    background: var(--bg-tertiary);
+    border-color: var(--primary-400);
+    color: var(--primary-400);
 }
 
 .pagination-number.active {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
+    background: var(--gradient-button);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
     cursor: default;
 }
 
