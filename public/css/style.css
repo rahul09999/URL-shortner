@@ -896,8 +896,14 @@ tbody tr:last-child td {
     color: var(--primary-200);
 }
 
-.redirect-url {
+.redirect-url-container {
     max-width: 350px;
+    overflow: hidden;
+}
+
+.redirect-url {
+    display: inline-block;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -992,6 +998,44 @@ tbody tr:last-child td {
 .analytics-btn svg {
     width: 16px;
     height: 16px;
+}
+
+.copy-short-url-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.copy-short-url-btn:hover {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: var(--primary-500);
+    color: var(--primary-500);
+    transform: scale(1.05);
+}
+
+.copy-short-url-btn:active {
+    transform: scale(0.95);
+}
+
+.copy-short-url-btn.copied {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: #10b981;
+    color: #10b981;
+}
+
+.copy-short-url-btn svg {
+    width: 14px;
+    height: 14px;
 }
 
 /* ========================================
