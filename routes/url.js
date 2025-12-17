@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
-const {handleGenerateNewShortUrl, handleAnalytics, handleUrlRedirect, handleDeleteShortUrl} = require('../controllers/url')
+const {handleGenerateNewShortUrl, handleAnalytics, handleDeleteShortUrl} = require('../controllers/url')
 
 // Rate limiting: max 25 links in 60 seconds
 const createUrlLimiter = rateLimit({
@@ -16,7 +16,8 @@ const createUrlLimiter = rateLimit({
 
 router.post('/', createUrlLimiter, handleGenerateNewShortUrl); // /url initial route we get from index.js
 
-router.get('/:shortId', handleUrlRedirect);
+// Note: Redirect route (/:shortId) is now handled as a public route in index.js
+// This route was moved to allow unauthenticated access to short URLs
 
 //Grab visitHistory.lenght and its array for total clicks and time of user visited that
 router.get('/analytics/:id', handleAnalytics);

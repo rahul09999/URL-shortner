@@ -24,7 +24,8 @@ const urlRoute = require('./routes/url');
 const staticRoute = require('./routes/staticRoute')
 const userRoute = require('./routes/user');
 // const {restrictToLoggedinUserOnly, checkBasicAth } = urequire('./middlewares/middleAuth'); //check For uuid, if not exist then redirect to login Page
-const { checkForAuthentication, restrictTo } = require('./middlewares/middleAuth'); 
+const { checkForAuthentication, restrictTo } = require('./middlewares/middleAuth');
+const { handleUrlRedirect } = require('./controllers/url'); 
 
 //Mongo-Connection
 mongooseConnect(`${mongoUri}/url-shortner`)
@@ -53,7 +54,11 @@ app.use(generalLimiter);
 
 app.use(checkForAuthentication);
 
+// Public route: Short URL redirect (no authentication required)
+app.get('/url/:shortId', handleUrlRedirect);
+
 //Route-middleware
+// Protected routes: create, analytics, delete (require authentication)
 app.use('/url', restrictTo(["NORMAL", "ADMIN"]), urlRoute);
 app.use('/', staticRoute);
 app.use('/user', userRoute);
